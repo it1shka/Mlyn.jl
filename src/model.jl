@@ -1,3 +1,3 @@
 create_model(blueprints) = create.(blueprints)
 
-predict = forward_pass
+predict = forward_pass!

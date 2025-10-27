@@ -3,9 +3,12 @@ const LayerFloat = Float32
 
 # Linear layer
 
-@kwdef struct Linear
+@kwdef mutable struct Linear
   weights :: Matrix{LayerFloat}
   bias :: Vector{LayerFloat}
+  cached_input :: Matrix{LayerFloat}
+  grad_weights :: Matrix{LayerFloat}
+  grad_bias :: Vector{LayerFloat}
 end
 
 @kwdef struct BlueprintLinear
@@ -17,14 +20,19 @@ end
 function create(blueprint :: BlueprintLinear)
   return Linear(
     weights = init_params(blueprint.init_method, blueprint.n_in, blueprint.n_out),
-    bias = zeros(LayerFloat, blueprint.n_out)
+    bias = zeros(LayerFloat, blueprint.n_out),
+    cached_input = Matrix{LayerFloat}(undef, 0, 0),
+    grad_weights = zeros(LayerFloat, blueprint.n_out, blueprint.n_in),
+    grad_bias = zeros(LayerFloat, blueprint.n_out)
   )
 end
 
 # Activation layer
 
-@kwdef struct Activation
+@kwdef mutable struct Activation
   fn :: Function
+  derivative :: Function
+  cached_input :: Matrix{LayerFloat}
 end
 
 @kwdef struct BlueprintActivation
@@ -33,6 +41,8 @@ end
 
 function create(blueprint :: BlueprintActivation)
   return Activation(
-    fn = get_activation(blueprint.act_method)
+    fn = get_activation(blueprint.act_method),
+    derivative = get_activation_derivative(blueprint.act_method),
+    cached_input = Matrix{LayerFloat}(undef, 0, 0)
   )
 end

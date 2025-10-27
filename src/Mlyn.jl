@@ -4,7 +4,12 @@ include("layer_param_init.jl")
 include("layer_activation.jl")
 include("layer.jl")
 
+include("model_fwd_pass.jl")
+include("model_bck_pass.jl")
+include("model.jl")
+
 export 
+  # from layer
   InitMethod,
   method_xavier_uniform,
   method_xavier_normal,
@@ -15,12 +20,8 @@ export
   method_tanh,
   method_softmax,
   BlueprintLinear,
-  BlueprintActivation
-
-include("model_fwd_pass.jl")
-include("model.jl")
-
-export
+  BlueprintActivation,
+  # from model
   create_model,
   predict
 
