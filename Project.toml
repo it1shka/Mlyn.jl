@@ -2,3 +2,11 @@ name = "Mlyn"
 uuid = "fd5aada0-c151-4972-b421-44a88e14d743"
 version = "0.1.0"
 authors = ["Tikhon Belousov <2tishbel@gmail.com>"]
+
+[deps]
+Distributions = "31c24e10-a181-5473-b8eb-7969acd0382f"
+JuliaFormatter = "98e50ef6-434e-11e9-1051-2b60c6c9e899"
+
+[compat]
+Distributions = "0.25.122"
+JuliaFormatter = "2.1.6"
