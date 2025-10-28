@@ -27,6 +27,11 @@ export
   BlueprintActivation,
 
   # from model
+  mse,
+  regression,
+  bce,
+  classification,
+  LossMethod,
   Model,
   create_model,
   train!,

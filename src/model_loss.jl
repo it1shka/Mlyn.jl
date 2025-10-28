@@ -49,8 +49,7 @@ end
 end
 
 function get_loss_functions(loss_type :: LossMethod)
-  loss_type_lower = lowercase(loss_type)
-  if loss_type_lower == mse || loss_type_lower == regression
+  if loss_type == mse || loss_type == regression
     return calculate_loss_mse, calculate_loss_gradient_mse
   end
   return calculate_loss_bce, calculate_loss_gradient_bce
