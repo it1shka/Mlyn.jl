@@ -7,6 +7,8 @@ include("layer.jl")
 include("model_fwd_pass.jl")
 include("model_bck_pass.jl")
 include("model_loss.jl")
+include("model_optim.jl")
+include("batch.jl")
 include("model.jl")
 
 export 
@@ -26,6 +28,7 @@ export
 
   # from model
   Model,
-  create_model
+  create_model,
+  train!
 
 end
