@@ -5,7 +5,7 @@
 
 # Stateless optimizer with constant learning rate
 
-struct OptimizerSGD
+@kwdef struct OptimizerSGD
   learning_rate :: LayerFloat
 end
 

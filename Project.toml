@@ -4,12 +4,18 @@ version = "0.1.0"
 authors = ["Tikhon Belousov <2tishbel@gmail.com>"]
 
 [deps]
+CSV = "336ed68f-0bac-5ca0-87d4-7b16caf5d00b"
+CategoricalArrays = "324d7699-5711-5eae-9e2f-1d82baa6b597"
+DataFrames = "a93c6f00-e57d-5684-b7b6-d8193f3e46c0"
 Distributions = "31c24e10-a181-5473-b8eb-7969acd0382f"
 IJulia = "7073ff75-c697-5162-941a-fcdaad2a7d2a"
 JuliaFormatter = "98e50ef6-434e-11e9-1051-2b60c6c9e899"
 Random = "9a3f8284-a2c9-5f02-9a11-845980a1fd5c"
 
 [compat]
+CSV = "0.10.15"
+CategoricalArrays = "1.0.2"
+DataFrames = "1.8.1"
 Distributions = "0.25.122"
 IJulia = "1.31.1"
 JuliaFormatter = "2.1.6"

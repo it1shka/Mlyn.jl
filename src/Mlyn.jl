@@ -9,6 +9,7 @@ include("model_bck_pass.jl")
 include("model_loss.jl")
 include("model_optim.jl")
 include("batch.jl")
+include("split.jl")
 include("model.jl")
 
 export 
@@ -34,7 +35,10 @@ export
   LossMethod,
   Model,
   create_model,
+  OptimizerSGD,
   train!,
-  predict
+  predict,
+  evaluate_model,
+  train_test_split
 
 end

@@ -33,7 +33,13 @@ function train_batch!(model :: Model, optimizer, X_batch, Y_batch)
   return loss
 end
 
-function train!(model :: Model, optimizer, X, Y, epochs; batch_size = 32, logging = true)
+function evaluate_model(model :: Model, X, Y_true)
+  Y_hat = forward_pass!(model.layers, X; train=false)
+  loss = model.loss_fn(Y_hat, Y_true)
+  return loss
+end
+
+function train!(model :: Model, optimizer, epochs, X, Y, X_test, Y_test; batch_size = 32, logging = true)
   loss_history = []
   for epoch in 1:epochs
     batches = create_batches(X, Y, batch_size)
@@ -43,9 +49,10 @@ function train!(model :: Model, optimizer, X, Y, epochs; batch_size = 32, loggin
       total_loss += batch_loss
     end
     avg_batch_loss = total_loss / length(batches)
-    push!(loss_history, avg_batch_loss)
+    test_loss = evaluate_model(model, X_test, Y_test)
+    push!(loss_history, (test_loss, avg_batch_loss))
     if logging
-      println("[EPOCH $(epoch)] Loss = $(avg_batch_loss)")
+      println("[EPOCH $(epoch)] Test loss = $(test_loss); Learning loss = $(avg_batch_loss)")
     end
   end
   return loss_history
