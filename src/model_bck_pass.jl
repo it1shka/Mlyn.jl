@@ -1,3 +1,13 @@
+# Formula for weights (at the bottom of the paper):
+# https://web.eecs.umich.edu/~justincj/teaching/eecs442/notes/linear-backprop.html
+# Formula for bias:
+# https://robotchinwag.com/posts/linear-layer-deriving-the-gradient-for-the-backward-pass/
+
+# On different sites you can find versions with
+# different order of matrix multiplication.
+# Order of matrix multiplication depends on the
+# convention. In my convention, columns are samples
+
 function backward_pass!(linear :: Linear, adopted_grad)
   linear.grad_weights .= adopted_grad * linear.cached_input'
   linear.grad_bias .= vec(sum(adopted_grad, dims=2))

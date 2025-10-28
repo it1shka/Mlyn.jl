@@ -6,6 +6,7 @@ include("layer.jl")
 
 include("model_fwd_pass.jl")
 include("model_bck_pass.jl")
+include("model_loss.jl")
 include("model.jl")
 
 export 
@@ -14,15 +15,17 @@ export
   method_xavier_uniform,
   method_xavier_normal,
   method_kaiming,
+
   ActivationMethod,
   method_relu,
   method_sigmoid,
   method_tanh,
-  method_softmax,
+
   BlueprintLinear,
   BlueprintActivation,
+
   # from model
-  create_model,
-  predict
+  Model,
+  create_model
 
 end
