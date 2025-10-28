@@ -29,6 +29,7 @@ export
   # from model
   Model,
   create_model,
-  train!
+  train!,
+  predict
 
 end

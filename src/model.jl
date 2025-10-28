@@ -17,11 +17,11 @@ end
 
 function zero_grad!(layers :: Vector)
   for layer in layers
-    if layer isa Linear
-      zero_grad!(layer)
-    end
+    zero_grad!(layer)
   end
 end
+
+zero_grad!(@nospecialize(args...); @nospecialize(kwargs...)) = nothing
 
 function train_batch!(model :: Model, optimizer, X_batch, Y_batch)
   zero_grad!(model.layers)
@@ -49,4 +49,8 @@ function train!(model :: Model, optimizer, X, Y, epochs; batch_size = 32, loggin
     end
   end
   return loss_history
+end
+
+function predict(model :: Model, X)
+  return forward_pass!(model.layers, X; train = false)
 end

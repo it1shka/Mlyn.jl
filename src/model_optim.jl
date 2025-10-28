@@ -18,8 +18,8 @@ end
 
 function optimize!(layers :: Vector, optimizer)
   for layer in layers
-    if layer isa Linear
-      optimize!(layer, optimizer)
-    end
+    optimize!(layer, optimizer)
   end
 end
+
+optimize!(@nospecialize(args...); @nospecialize(kwargs...)) = nothing
