@@ -46,3 +46,50 @@ function create(blueprint :: BlueprintActivation)
     cached_input = Matrix{LayerFloat}(undef, 0, 0)
   )
 end
+
+# Batch normalization layer
+
+# https://www.geeksforgeeks.org/deep-learning/what-is-batch-normalization-in-deep-learning/
+
+@kwdef mutable struct BatchNorm1D
+  # Trainable Parameters: y = γx̂+β
+  # updated by optimizer, depend on grad_γ and grad_β
+  γ :: Vector{LayerFloat} # scale
+  β :: Vector{LayerFloat} # shift
+  # Gradients for optimizer
+  grad_γ :: Vector{LayerFloat}
+  grad_β :: Vector{LayerFloat}
+
+  # parameters used only in non-training mode
+  μ_running :: Vector{LayerFloat} # mean of all batches
+  σ2_running :: Vector{LayerFloat} # variance of all batches
+  momentum :: LayerFloat # Decay rate for running averages (often 0.9 or 0.99)
+
+  # Cached values for backward pass
+  X_hat :: Matrix{LayerFloat} # Normalized input
+  μ_batch :: Vector{LayerFloat} # Batch mean
+  σ2_batch :: Vector{LayerFloat} # Batch variance
+
+  # TODO: move epsilon here ϵ for consistency
+end
+
+@kwdef struct BlueprintBatchNorm1D
+  n_features :: Int
+  momentum :: LayerFloat = 0.9
+end
+
+function create(blueprint :: BlueprintBatchNorm1D)
+  n = blueprint.n_features
+  return BatchNorm1D(
+    γ = ones(LayerFloat, n),
+    β = zeros(LayerFloat, n),
+    grad_γ = zeros(LayerFloat, n),
+    grad_β = zeros(LayerFloat, n),
+    μ_running = zeros(LayerFloat, n),
+    σ2_running = ones(LayerFloat, n), # Initialize variance to 1.0
+    momentum = blueprint.momentum,
+    X_hat = Matrix{LayerFloat}(undef, 0, 0),
+    μ_batch = Vector{LayerFloat}(undef, 0),
+    σ2_batch = Vector{LayerFloat}(undef, 0)
+  )
+end

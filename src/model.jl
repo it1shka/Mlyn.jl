@@ -15,6 +15,11 @@ function zero_grad!(layer :: Linear)
   layer.grad_bias .= 0.0
 end
 
+function zero_grad!(layer :: BatchNorm1D)
+  layer.grad_γ .= 0.0
+  layer.grad_β .= 0.0
+end
+
 function zero_grad!(layers :: Vector)
   for layer in layers
     zero_grad!(layer)

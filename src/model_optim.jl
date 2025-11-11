@@ -11,16 +11,20 @@ end
 
 function optimize!(layers :: Vector, optimizer :: OptimizerSGD)
   for layer in layers
-    if layer isa Linear
+    if (layer isa Linear) || (layer isa BatchNorm1D)
       optimize!(layer, optimizer)
     end
-    # TODO: add batchnorm
   end
 end
 
 function optimize!(linear :: Linear, optimizer :: OptimizerSGD)
   linear.weights .-= optimizer.learning_rate .* linear.grad_weights
   linear.bias .-= optimizer.learning_rate .* linear.grad_bias
+end
+
+function optimize!(batchnorm :: BatchNorm1D, optimizer :: OptimizerSGD)
+  batchnorm.γ .-= optimizer.learning_rate .* batchnorm.grad_γ
+  batchnorm.β .-= optimizer.learning_rate .* batchnorm.grad_β
 end
 
 # Adam optimizer (Adaptive moment estimation)
@@ -65,6 +69,12 @@ function init_adam!(adam :: OptimizerAdam, layers :: Vector)
       push!(adam.m_bias, zeros(LayerFloat, n_out))
       push!(adam.v_weights, zeros(LayerFloat, n_out, n_in))
       push!(adam.v_bias, zeros(LayerFloat, n_out))
+    elseif layer isa BatchNorm1D
+      n = size(layer.γ, 1)
+      push!(adam.m_weights, zeros(LayerFloat, n, 1))
+      push!(adam.m_bias, zeros(LayerFloat, n))
+      push!(adam.v_weights, zeros(LayerFloat, n, 1))
+      push!(adam.v_bias, zeros(LayerFloat, n))
     end
   end
 end
@@ -73,7 +83,7 @@ function optimize!(layers :: Vector, optimizer :: OptimizerAdam)
   optimizer.t += 1
   param_index = 1
   for layer in layers
-    if layer isa Linear
+    if (layer isa Linear) || (layer isa BatchNorm1D)
       optimize!(layer, param_index, optimizer)
       param_index += 1
     end
@@ -97,4 +107,36 @@ function optimize!(linear :: Linear, param_index, optimizer :: OptimizerAdam)
   m_hat_b = optimizer.m_bias[param_index] ./ bias_correction_1
   v_hat_b = optimizer.v_bias[param_index] ./ bias_correction_2
   linear.bias .-= α .* m_hat_b ./ (sqrt.(v_hat_b) .+ ϵ)
+end
+
+function optimize!(batchnorm :: BatchNorm1D, idx, optimizer :: OptimizerAdam)
+  α, β1, β2, ϵ = optimizer.α, optimizer.β1, optimizer.β2, optimizer.ϵ
+  t = optimizer.t
+  
+  bias_correction_1 = 1 - β1^t
+  bias_correction_2 = 1 - β2^t
+  
+  dγ = batchnorm.grad_γ |> x -> reshape(x, :, 1)
+  m_γ = optimizer.m_weights[idx]
+  v_γ = optimizer.v_weights[idx]
+  
+  m_γ .= β1 .* m_γ .+ (1 - β1) .* dγ
+  v_γ .= β2 .* v_γ .+ (1 - β2) .* (dγ .^ 2)
+  
+  m_hat_γ = m_γ ./ bias_correction_1
+  v_hat_γ = v_γ ./ bias_correction_2
+  
+  batchnorm.γ .-= α .* vec(m_hat_γ) ./ (sqrt.(vec(v_hat_γ)) .+ ϵ)
+
+  dβ = batchnorm.grad_β
+  m_β = optimizer.m_bias[idx]
+  v_β = optimizer.v_bias[idx]
+
+  m_β .= β1 .* m_β .+ (1 - β1) .* dβ
+  v_β .= β2 .* v_β .+ (1 - β2) .* (dβ .^ 2)
+  
+  m_hat_β = m_β ./ bias_correction_1
+  v_hat_β = v_β ./ bias_correction_2
+  
+  batchnorm.β .-= α .* m_hat_β ./ (sqrt.(v_hat_β) .+ ϵ)
 end

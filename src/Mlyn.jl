@@ -27,6 +27,7 @@ export
 
   BlueprintLinear,
   BlueprintActivation,
+  BlueprintBatchNorm1D,
 
   # from model
   mse,
