@@ -140,3 +140,61 @@ function optimize!(batchnorm :: BatchNorm1D, idx, optimizer :: OptimizerAdam)
   
   batchnorm.β .-= α .* m_hat_β ./ (sqrt.(v_hat_β) .+ ϵ)
 end
+
+# SGD with Momentum -- like Adam but simpler
+
+@kwdef mutable struct OptimizerSGDM
+    η :: LayerFloat = 0.01
+    μ :: LayerFloat = 0.9
+    v_weights :: Vector{Matrix{LayerFloat}} = []
+    v_bias :: Vector{Vector{LayerFloat}} = []
+end
+
+function init_sgdm!(sgdm :: OptimizerSGDM, layers :: Vector)
+  sgdm.v_weights = []
+  sgdm.v_bias = []
+
+  for layer in layers
+    if layer isa Linear
+      n_out, n_in = size(layer.weights)
+      push!(sgdm.v_weights, zeros(LayerFloat, n_out, n_in))
+      push!(sgdm.v_bias, zeros(LayerFloat, n_out))
+    elseif layer isa BatchNorm1D
+      n = size(layer.γ, 1)
+      push!(sgdm.v_weights, zeros(LayerFloat, n, 1))
+      push!(sgdm.v_bias, zeros(LayerFloat, n))
+    end
+  end
+end
+
+function optimize!(layers :: Vector, optimizer :: OptimizerSGDM)
+  param_index = 1
+  for layer in layers
+    if (layer isa Linear) || (layer isa BatchNorm1D)
+      optimize!(layer, param_index, optimizer)
+      param_index += 1
+    end
+  end
+end
+
+
+function optimize!(linear :: Linear, idx :: Int, optimizer :: OptimizerSGDM)
+    η, μ = optimizer.η, optimizer.μ
+    v_w = optimizer.v_weights[idx]
+    v_w .= μ .* v_w .+ η .* linear.grad_weights
+    linear.weights .-= v_w
+    v_b = optimizer.v_bias[idx]
+    v_b .= μ .* v_b .+ η .* linear.grad_bias
+    linear.bias .-= v_b
+end
+
+function optimize!(bn :: BatchNorm1D, idx :: Int, optimizer :: OptimizerSGDM)
+    η, μ = optimizer.η, optimizer.μ
+    v_gamma_matrix = optimizer.v_weights[idx]
+    grad_gamma_matrix = reshape(bn.grad_γ, :, 1)
+    v_gamma_matrix .= μ .* v_gamma_matrix .+ η .* grad_gamma_matrix
+    bn.γ .-= vec(v_gamma_matrix)
+    v_beta = optimizer.v_bias[idx]
+    v_beta .= μ .* v_beta .+ η .* bn.grad_β
+    bn.β .-= v_beta
+end

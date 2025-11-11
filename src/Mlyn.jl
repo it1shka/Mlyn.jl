@@ -41,6 +41,8 @@ export
   OptimizerSGD,
   OptimizerAdam,
   init_adam!,
+  OptimizerSGDM,
+  init_sgdm!,
   train!,
   predict,
   evaluate_model,
