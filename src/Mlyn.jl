@@ -19,6 +19,7 @@ export
   method_xavier_uniform,
   method_xavier_normal,
   method_kaiming,
+  method_const,
 
   ActivationMethod,
   method_relu,
