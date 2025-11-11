@@ -51,5 +51,6 @@ export
   # from utils
   history_plot,
   history_best_result,
+  history_plot_gradients,
   history_plot_test_loss
 end

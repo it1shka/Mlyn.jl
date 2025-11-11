@@ -11,6 +11,11 @@ function history_plot_test_loss(history)
   plot(test_loss, title="Learning curve: test loss", label="test loss")
 end
 
+function history_plot_gradients(history)
+  gradients = getfield.(history, 3)
+  plot(gradients, title="Gradients", label="gradient")
+end
+
 function history_best_result(history)
   test_loss = getfield.(history, 1)
   train_loss = getfield.(history, 2)
