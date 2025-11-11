@@ -19,6 +19,7 @@ export
   method_xavier_uniform,
   method_xavier_normal,
   method_kaiming,
+  method_const,
 
   ActivationMethod,
   method_relu,
@@ -40,6 +41,8 @@ export
   OptimizerSGD,
   OptimizerAdam,
   init_adam!,
+  OptimizerSGDM,
+  init_sgdm!,
   train!,
   predict,
   evaluate_model,
@@ -48,5 +51,6 @@ export
   # from utils
   history_plot,
   history_best_result,
+  history_plot_gradients,
   history_plot_test_loss
 end

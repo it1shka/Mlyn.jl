@@ -1,3 +1,5 @@
+using Statistics
+
 @kwdef struct Model
   layers :: Vector
   loss_fn :: Function
@@ -44,7 +46,26 @@ function evaluate_model(model :: Model, X, Y_true)
   return loss
 end
 
-function train!(model :: Model, optimizer, epochs, X, Y, X_test, Y_test; batch_size = 32, logging = true, log_period = 10)
+# reporting gradients
+function retrieve_gradients(model :: Model)
+  gradients = []
+  for layer in model.layers
+    if layer isa Linear
+      w = mean(layer.grad_weights)
+      push!(gradients, w)
+      b = mean(layer.grad_bias)
+      push!(gradients, b)
+    elseif layer isa BatchNorm1D
+      γ = mean(layer.grad_γ)
+      push!(gradients, γ)
+      β = mean(layer.grad_β)
+      push!(gradients, β)
+    end
+  end
+  return mean(gradients)
+end
+
+function train!(model :: Model, optimizer, epochs, X, Y, X_test, Y_test; batch_size = 32, logging = true, log_period = 10, report_grad = false)
   loss_history = []
   for epoch in 1:epochs
     batches = create_batches(X, Y, batch_size)
@@ -55,9 +76,19 @@ function train!(model :: Model, optimizer, epochs, X, Y, X_test, Y_test; batch_s
     end
     avg_batch_loss = total_loss / length(batches)
     test_loss = evaluate_model(model, X_test, Y_test)
-    push!(loss_history, (test_loss, avg_batch_loss))
+
     if logging && (epoch == 1 || epoch == epochs || epoch % log_period == 0)
       println("[EPOCH $(epoch)] Test loss = $(test_loss); Learning loss = $(avg_batch_loss)")
+    end
+
+    if report_grad
+      avg_grad = retrieve_gradients(model)
+      push!(loss_history, (test_loss, avg_batch_loss, avg_grad))
+      if logging && (epoch == 1 || epoch == epochs || epoch % log_period == 0)
+        println("[EPOCH $(epoch)] Average gradient = $(avg_grad)")
+      end
+    else
+      push!(loss_history, (test_loss, avg_batch_loss))
     end
   end
   return loss_history
