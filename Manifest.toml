@@ -2,7 +2,7 @@
 
 julia_version = "1.12.0"
 manifest_format = "2.0"
-project_hash = "42233c4a874759c33d413fa9d75ec9b75be41c77"
+project_hash = "34d49e96537356b2acb96685f3d0e9d3903b6938"
 
 [[deps.AliasTables]]
 deps = ["PtrArrays", "Random"]
@@ -642,7 +642,7 @@ uuid = "e1d29d7a-bbdc-5cf2-9ac0-f12de2c33e28"
 version = "1.2.0"
 
 [[deps.Mlyn]]
-deps = ["CSV", "CategoricalArrays", "DataFrames", "Distributions", "IJulia", "JuliaFormatter", "Random"]
+deps = ["CSV", "CategoricalArrays", "DataFrames", "Distributions", "IJulia", "JuliaFormatter", "Plots", "Random"]
 path = "."
 uuid = "fd5aada0-c151-4972-b421-44a88e14d743"
 version = "0.1.0"

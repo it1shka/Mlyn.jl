@@ -1,3 +1,5 @@
+using Statistics
+
 function forward_pass!(linear :: Linear, X, train)
   if train
     linear.cached_input = X
