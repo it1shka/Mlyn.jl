@@ -19,6 +19,26 @@ function backward_pass!(activation :: Activation, adopted_grad)
   return adopted_grad .* local_grad
 end
 
+function backward_pass!(batchnorm :: BatchNorm1D, adopted_grad)
+    N = size(adopted_grad, 2)
+    ϵ = LayerFloat(1e-5)
+    
+    X_hat = batchnorm.X_hat
+    σ2_batch = batchnorm.σ2_batch
+    γ = batchnorm.γ
+    
+    batchnorm.grad_β .= vec(sum(adopted_grad, dims=2)) 
+    batchnorm.grad_γ .= vec(sum(adopted_grad .* X_hat, dims=2))
+    
+    dY_scaled = γ .* adopted_grad
+    var_term = sum(dY_scaled .* X_hat, dims=2)
+    mean_term = sum(dY_scaled, dims=2)
+    inv_std = 1.0 ./ sqrt.(σ2_batch .+ ϵ)
+    dX = (inv_std) .* (dY_scaled .- (1/N) .* mean_term .- (1/N) .* (X_hat .* var_term))
+    
+    return dX
+end
+
 function backward_pass!(layers :: Vector, initial_grad)
   running_grad = initial_grad
   for layer in reverse(layers)
