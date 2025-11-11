@@ -11,6 +11,7 @@ include("model_optim.jl")
 include("batch.jl")
 include("split.jl")
 include("model.jl")
+include("utils.jl")
 
 export 
   # from layer
@@ -41,6 +42,10 @@ export
   train!,
   predict,
   evaluate_model,
-  train_test_split
+  train_test_split,
 
+  # from utils
+  history_plot,
+  history_best_result,
+  history_plot_test_loss
 end
